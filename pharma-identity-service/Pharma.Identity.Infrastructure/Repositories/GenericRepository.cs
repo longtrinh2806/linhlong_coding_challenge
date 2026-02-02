@@ -31,9 +31,11 @@ public class GenericRepository<TEntity>(
         return await FindAsync(predicate, null, null, cancellationToken);
     }
 
-    public Task<TEntity?> GetFirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
+    public Task<TEntity?> GetFirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate,
+        Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object?>>? include = null,
+        CancellationToken cancellationToken = default)
     {
-        var query = ApplyQueryOptions(DbSet, predicate, null, null);
+        var query = ApplyQueryOptions(DbSet, predicate, include, null);
 
         return query.FirstOrDefaultAsync(cancellationToken);
     }

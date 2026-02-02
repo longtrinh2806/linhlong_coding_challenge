@@ -17,7 +17,9 @@ public interface IGenericRepository<TEntity> where TEntity : class
         CancellationToken cancellationToken = default
     );
 
-    Task<TEntity?> GetFirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default);
+    Task<TEntity?> GetFirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate,
+        Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object?>>? include = null,
+        CancellationToken cancellationToken = default);
 
     Task<TEntity> AddAsync(TEntity entity, CancellationToken cancellationToken = default);
 
