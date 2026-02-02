@@ -6,7 +6,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Pharma.Identity.Application.Common.Abstractions;
-using Pharma.Identity.Application.Features.Authentication.Messages;
 using Pharma.Identity.Infrastructure.Configurations;
 using Pharma.Identity.Infrastructure.Persistence;
 using Pharma.Identity.Infrastructure.Persistence.Interceptors;
@@ -73,11 +72,6 @@ public static class DependencyInjection
                         h.Password(userInfo[1]);
                     }
                 });
-
-                config.Message<IdentityUserRegisteredEvent>(configurator =>
-                {
-                    configurator.SetEntityName("identity.user-registered");
-                }); 
 
                 config.ConfigureEndpoints(context);
             });
