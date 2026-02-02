@@ -18,5 +18,11 @@ public class User : AuditableEntity
 
     public bool IsAccountLocked { get; set; }
 
+    public int FailedLoginAttempts { get; set; }
+
+    public DateTime? LastFailedLoginAt { get; set; }
+
+    public DateTime? LockedUntil { get; set; }
+
     public Role Role { get; set; } = null!;
 }

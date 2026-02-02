@@ -90,10 +90,9 @@ public static class RefreshToken
                 userId, remainingTtl.TotalMinutes);
 
             return OperationResult.Ok(new LoginResponse(
-                RequiresTwoFactor: false,
                 AccessToken: newAccessToken,
                 RefreshToken: newRefreshToken,
-                TwoFactorToken: null
+                UserRole: null
             ));
         }
 
