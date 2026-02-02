@@ -1,0 +1,47 @@
+name: "CI: PR build"
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore
+        working-directory: pharma-identity-service
+        run: dotnet restore
+
+      - name: Build
+        working-directory: pharma-identity-service
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Detect test projects
+        id: find-tests
+        run: |
+          set -e
+          if git ls-files '*.Tests/*.csproj' '*.Test/*.csproj' '*.UnitTests/*.csproj' '*.IntegrationTests/*.csproj' | grep -q .; then
+            echo "found=true" >> $GITHUB_OUTPUT
+          else
+            echo "found=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run tests (if any)
+        if: steps.find-tests.outputs.found == 'true'
+        run: dotnet test --configuration Release --no-build --verbosity normal
