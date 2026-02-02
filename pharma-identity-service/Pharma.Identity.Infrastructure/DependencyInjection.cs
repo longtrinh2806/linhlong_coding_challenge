@@ -1,5 +1,4 @@
 using System.Text;
-using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -46,35 +45,6 @@ public static class DependencyInjection
         services.AddStackExchangeRedisCache(options =>
         {
             options.Configuration = redisConnectionString;
-        });
-
-        #endregion
-
-        #region MassTransit Configuration
-
-        var rabbitMqConnectionString = Environment.GetEnvironmentVariable("RABBITMQ_CONNECTION_STRING")!;
-
-        services.AddMassTransit(x =>
-        {
-            x.UsingRabbitMq((context, config) =>
-            {
-                var uri = new Uri(rabbitMqConnectionString);
-
-                config.Host(uri.Host, h =>
-                {
-                    if (string.IsNullOrEmpty(uri.UserInfo)) return;
-
-                    var userInfo = uri.UserInfo.Split(':');
-                    h.Username(userInfo[0]);
-
-                    if (userInfo.Length > 1)
-                    {
-                        h.Password(userInfo[1]);
-                    }
-                });
-
-                config.ConfigureEndpoints(context);
-            });
         });
 
         #endregion
