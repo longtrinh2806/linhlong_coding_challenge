@@ -2,7 +2,6 @@ using FluentValidation;
 using MediatR;
 using Pharma.Identity.Application.Common.Abstractions;
 using Pharma.Identity.Application.Common.OperationResult;
-using Pharma.Identity.Application.Features.Authentication.DomainEvents;
 using Pharma.Identity.Domain.Entities;
 
 namespace Pharma.Identity.Application.Features.Authentication.Commands;
@@ -11,7 +10,7 @@ public static class Register
 {
     public record RegisterCommand(string Email, string Password, string ConfirmPassword) : IRequest<OperationResult>;
 
-    internal sealed class RegisterCommandValidator : AbstractValidator<RegisterCommand>
+    public sealed class RegisterCommandValidator : AbstractValidator<RegisterCommand>
     {
         public RegisterCommandValidator()
         {
@@ -25,7 +24,11 @@ public static class Register
                 .NotEmpty()
                 .WithMessage("Password is required")
                 .MinimumLength(12)
-                .WithMessage("Password must be at least 12 characters");
+                .WithMessage("Password must be at least 12 characters")
+                .Matches(@"[A-Z]")
+                .WithMessage("Password must contain at least one uppercase letter")
+                .Matches(@"[!@#$%^&*()_+\-=\[\]{};':""\\|,.<>\/?]")
+                .WithMessage("Password must contain at least one special character");
 
             RuleFor(x => x.ConfirmPassword)
                 .NotEmpty()
@@ -36,28 +39,13 @@ public static class Register
     }
 
     internal sealed class RegisterCommandHandler(
-        IMediator mediator,
         IHasher hasher,
-        ICachingService cachingService,
         IGenericRepository<User> userRepository
     ) : IRequestHandler<RegisterCommand, OperationResult>
     {
         public async Task<OperationResult> Handle(RegisterCommand request, CancellationToken cancellationToken)
         {
-            User? existingUser;
-            var cachedUserKey = Constant.CacheKeys.PendingUser(request.Email);
-
-            try
-            {
-                existingUser = await cachingService.GetAsync<User>(cachedUserKey, cancellationToken);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-
-            existingUser ??= await userRepository.GetFirstOrDefaultAsync(
+            var existingUser = await userRepository.GetFirstOrDefaultAsync(
                 user => user.Email == request.Email,
                 cancellationToken: cancellationToken
             );
@@ -71,10 +59,11 @@ public static class Register
             {
                 UserId = Ulid.NewUlid(),
                 Email = request.Email,
-                Password = hasher.HashValue(request.Password)
+                Password = hasher.HashValue(request.Password),
+                RoleId = Constant.RoleIds.Viewer
             };
 
-            await mediator.Publish(new UserRegisteredEvent(newUser), cancellationToken);
+            await userRepository.AddAsync(newUser, cancellationToken);
 
             return OperationResult.Ok();
         }
