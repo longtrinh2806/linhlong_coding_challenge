@@ -1,0 +1,37 @@
+﻿{
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "http": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": false,
+      "applicationUrl": "http://localhost:8080",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "DB_CONNECTION_STRING": "Host=localhost;Port=5432;Database=pharma-db;Username=longtk5;Password=12345;SSL Mode=Disable;Include Error Detail=true",
+        "READONLY_DB_CONNECTION_STRING": "Host=localhost;Port=5432;Database=pharma-db;Username=longtk5;Password=12345;SSL Mode=Disable;Include Error Detail=true",
+        "REDIS_CONNECTION_STRING": "localhost:6379",
+        "DEFAULT_CACHE_EXPIRATION_MINUTES" : "15",
+        "RABBITMQ_CONNECTION_STRING": "amqp://longtk5:12345@localhost:5672",
+        "JWT_ISSUER" : "Pharma.Identity",
+        "JWT_AUDIENCE" : "Pharma.Clients",
+        "JWT_SECRET_KEY" : "YourSuperSecretKey123456789~!@#$%^&*()_++_)(*&^%$#@!~~!@#$%^&*()_++_)(*&^%$#@!~",
+        "JWT_ACCESS_TOKEN_EXPIRATION_MINUTES" : "60",
+        "JWT_REFRESH_TOKEN_EXPIRATION_DAYS" : "7",
+        "ENCRYPTION_KEY": "HQ6Q3Z0S1Ap9Iq+x4idcu/NGCTN1h4NpZt6o8wB6Cmw=",
+        "ENCRYPTION_IV": "5+ctVfuAm8eRXJJvnDa59g=="
+      }
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "launchBrowser": false,
+      "launchUrl": "http://localhost:8080",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Production",
+        "ASPNETCORE_URLS": "http://+:8080"
+      },
+      "publishAllPorts": false,
+      "useSSL": false
+    }
+  }
+}

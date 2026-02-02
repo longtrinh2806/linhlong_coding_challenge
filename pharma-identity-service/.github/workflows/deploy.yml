@@ -1,0 +1,71 @@
+name: 🚀 Deploy to EC2 via Git Pull + Docker Compose
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [develop] # Deploy khi PR được merge vào develop
+
+jobs:
+  deploy:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code (for Actions context)
+        uses: actions/checkout@v4
+
+      - name: Deploy on EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script_stop: true
+          script: |
+            set -e
+
+            echo "📂 Navigating to project folder..."
+            cd /home/ubuntu/pharma-app/pharma-identity-service
+
+            echo "🔄 Pulling latest code..."
+            git fetch origin develop
+            git reset --hard origin/develop
+
+            echo "🧹 Stopping previous containers..."
+            
+            cd pharma-identity-service
+            
+            sudo docker-compose down || true
+
+            echo "🛠️ Building new Docker images..."
+            sudo docker-compose -f docker-compose.yml build --no-cache
+
+            echo "🚀 Starting new containers..."
+            sudo docker-compose -f docker-compose.yml up -d
+
+            echo "🧽 Cleaning up old images..."
+            sudo docker system prune -af
+
+            echo "✅ Deployment complete!"
+
+      # ----------------------------------------
+      # Verify deployment health
+      # ----------------------------------------
+      - name: Verify deployment
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script_stop: true
+          script: |
+            echo "⏳ Waiting for services to start..."
+            sleep 15
+            
+            echo "🔍 Checking running containers..."
+            sudo docker ps
+            
+            echo "🌐 Checking API health endpoint..."
+            curl -f http://localhost:8080/api/health || (echo "❌ Health check failed!" && exit 1)
+            
+            echo "✅ Deployment verified successfully!"
