@@ -17,10 +17,43 @@ namespace Pharma.Identity.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.0")
+                .HasAnnotation("ProductVersion", "10.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("Pharma.Identity.Domain.Entities.Role", b =>
+                {
+                    b.Property<int>("RoleId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("role_id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("RoleId"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("name");
+
+                    b.HasKey("RoleId")
+                        .HasName("pk_role");
+
+                    b.ToTable("role", "pharma_identity");
+
+                    b.HasData(
+                        new
+                        {
+                            RoleId = 1,
+                            Name = "Editor"
+                        },
+                        new
+                        {
+                            RoleId = 2,
+                            Name = "Viewer"
+                        });
+                });
 
             modelBuilder.Entity("Pharma.Identity.Domain.Entities.User", b =>
                 {
@@ -47,17 +80,9 @@ namespace Pharma.Identity.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("first_name");
 
-                    b.Property<string>("HashedBackupCodes")
-                        .HasColumnType("jsonb")
-                        .HasColumnName("hashed_backup_codes");
-
                     b.Property<bool>("IsAccountLocked")
                         .HasColumnType("boolean")
                         .HasColumnName("is_account_locked");
-
-                    b.Property<bool>("IsTwoFactorEnabled")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_two_factor_enabled");
 
                     b.Property<string>("LastName")
                         .HasColumnType("text")
@@ -68,9 +93,9 @@ namespace Pharma.Identity.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("password");
 
-                    b.Property<string>("TotpSecretEncrypted")
-                        .HasColumnType("text")
-                        .HasColumnName("totp_secret_encrypted");
+                    b.Property<int>("RoleId")
+                        .HasColumnType("integer")
+                        .HasColumnName("role_id");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -83,7 +108,22 @@ namespace Pharma.Identity.Infrastructure.Migrations
                     b.HasKey("UserId")
                         .HasName("pk_user");
 
+                    b.HasIndex("RoleId")
+                        .HasDatabaseName("ix_user_role_id");
+
                     b.ToTable("user", "pharma_identity");
+                });
+
+            modelBuilder.Entity("Pharma.Identity.Domain.Entities.User", b =>
+                {
+                    b.HasOne("Pharma.Identity.Domain.Entities.Role", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_user_roles_role_id");
+
+                    b.Navigation("Role");
                 });
 #pragma warning restore 612, 618
         }

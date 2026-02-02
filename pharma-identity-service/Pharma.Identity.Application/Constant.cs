@@ -17,4 +17,10 @@ public static class Constant
     public const string IdentityDatabaseSchema = "pharma_identity";
 
     public const string ApplicationName = "PharmaApp";
+
+    public static class RoleIds
+    {
+        public const int Editor = 1;
+        public const int Viewer = 2;
+    }
 }

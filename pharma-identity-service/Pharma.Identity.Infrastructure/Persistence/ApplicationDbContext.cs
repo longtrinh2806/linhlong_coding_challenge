@@ -8,12 +8,14 @@ namespace Pharma.Identity.Infrastructure.Persistence;
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
 {
     public DbSet<User> Users { get; init; }
+    public DbSet<Role> Roles { get; init; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.ApplyConfiguration(new UserConfiguration());
+        modelBuilder.ApplyConfiguration(new RoleConfiguration());
 
         var ulidConverter = new ValueConverter<Ulid, string>(
             v => v.ToString(),
