@@ -31,26 +31,6 @@ services:
     networks:
       - app_network
 
-  rabbitmq:
-    image: rabbitmq:3.13-management
-    container_name: rabbitmq
-    environment:
-      RABBITMQ_DEFAULT_USER: longtk5
-      RABBITMQ_DEFAULT_PASS: 12345
-    ports:
-      - "5672:5672"    # AMQP port
-      - "15672:15672"  # Management UI port
-    volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-    networks:
-      - app_network
-
 volumes:
   postgres_data:
   redis-data:
