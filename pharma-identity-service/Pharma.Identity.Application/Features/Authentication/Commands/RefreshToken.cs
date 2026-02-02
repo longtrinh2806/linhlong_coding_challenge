@@ -12,7 +12,7 @@ public static class RefreshToken
 {
     public record RefreshTokenCommand(string RefreshToken) : IRequest<OperationResult<LoginResponse>>;
 
-    internal sealed class RefreshTokenCommandValidator : AbstractValidator<RefreshTokenCommand>
+    public sealed class RefreshTokenCommandValidator : AbstractValidator<RefreshTokenCommand>
     {
         public RefreshTokenCommandValidator()
         {
@@ -31,15 +31,13 @@ public static class RefreshToken
         public async Task<OperationResult<LoginResponse>> Handle(RefreshTokenCommand request,
             CancellationToken cancellationToken)
         {
-            // Step 1: Validate JWT signature and structure
-            var principal = jwtTokenService.ValidateRefreshToken(request.RefreshToken);
-            if (principal is null)
+            var claimsPrincipal = jwtTokenService.ValidateRefreshToken(request.RefreshToken);
+            if (claimsPrincipal is null)
             {
                 return OperationResult.Unauthorized("Invalid refresh token");
             }
 
-            // Step 2: Extract and validate user claims
-            var claimsValidationResult = ExtractAndValidateClaims(principal);
+            var claimsValidationResult = ExtractAndValidateClaims(claimsPrincipal);
             if (!claimsValidationResult.IsSuccess)
             {
                 return claimsValidationResult.Error!;
@@ -47,15 +45,13 @@ public static class RefreshToken
 
             var (userId, email) = claimsValidationResult.Value;
 
-            // Step 3: Verify token exists in cache
             var cacheValidationResult = await ValidateTokenInCache(userId, request.RefreshToken, cancellationToken);
             if (!cacheValidationResult.IsSuccess)
             {
                 return cacheValidationResult.Error!;
             }
 
-            // Step 4: Calculate remaining TTL
-            var ttlResult = CalculateRemainingTtl(principal, userId);
+            var ttlResult = CalculateRemainingTtl(claimsPrincipal, userId);
             if (!ttlResult.IsSuccess)
             {
                 return ttlResult.Error!;
@@ -63,14 +59,6 @@ public static class RefreshToken
 
             var remainingTtl = ttlResult.Value;
 
-            // Step 5: Invalidate old refresh token
-            var invalidationResult = await InvalidateOldRefreshToken(userId, cancellationToken);
-            if (!invalidationResult.IsSuccess)
-            {
-                return invalidationResult.Error!;
-            }
-
-            // Step 6: Generate new tokens with remaining TTL
             var newAccessToken = jwtTokenService.GenerateAccessToken(userId, email);
             var newRefreshToken = jwtTokenService.GenerateRefreshToken(
                 userId: userId,
@@ -78,7 +66,6 @@ public static class RefreshToken
                 expiration: remainingTtl
             );
 
-            // Step 7: Store new refresh token in cache
             var storeResult = await StoreNewRefreshToken(userId, newRefreshToken, remainingTtl, cancellationToken);
             if (!storeResult.IsSuccess)
             {
@@ -161,25 +148,6 @@ public static class RefreshToken
 
             logger.LogWarning("Refresh token expired for user {UserId}", userId);
             return (false, TimeSpan.Zero, OperationResult.Unauthorized("Refresh token expired"));
-        }
-
-        private async Task<(bool IsSuccess, OperationResult<LoginResponse>? Error)> InvalidateOldRefreshToken(
-            Ulid userId,
-            CancellationToken cancellationToken)
-        {
-            var refreshTokenCacheKey = Constant.CacheKeys.RefreshToken(userId);
-
-            try
-            {
-                await cachingService.RemoveAsync(refreshTokenCacheKey, cancellationToken);
-                logger.LogInformation("Invalidated old refresh token for user {UserId}", userId);
-                return (true, null);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Failed to remove old refresh token for user {UserId}", userId);
-                return (false, OperationResult.BadRequest("Failed to process refresh token"));
-            }
         }
 
         private async Task<(bool IsSuccess, OperationResult<LoginResponse>? Error)> StoreNewRefreshToken(
