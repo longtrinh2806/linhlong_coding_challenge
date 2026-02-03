@@ -29,7 +29,7 @@ public class AuthenticationController(IMediator mediator) : ControllerBase
         return result.ToResult();
     }
 
-    [HttpPost("refresh-token")]
+    [HttpPost("refresh")]
     public async Task<IResult> RefreshTokenAsync([FromBody] RefreshTokenRequest request, CancellationToken cancellationToken)
     {
         var result = await mediator.Send(
