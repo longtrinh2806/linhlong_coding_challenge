@@ -13,7 +13,7 @@ This project follows **Clean Architecture** with the following layers:
 
 ## 🛠️ Tech Stack
 
-- **.NET 9** - Latest .NET framework
+- **.NET 10** - Latest .NET framework
 - **PostgreSQL 18** - Primary database
 - **Redis 8.0.5** - Caching and token management
 - **Entity Framework Core** - ORM
