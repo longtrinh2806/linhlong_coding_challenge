@@ -16,7 +16,7 @@
         "JWT_ISSUER" : "Pharma.Identity",
         "JWT_AUDIENCE" : "Pharma.Clients",
         "JWT_SECRET_KEY" : "YourSuperSecretKey123456789~!@#$%^&*()_++_)(*&^%$#@!~~!@#$%^&*()_++_)(*&^%$#@!~",
-        "JWT_ACCESS_TOKEN_EXPIRATION_MINUTES" : "60",
+        "JWT_ACCESS_TOKEN_EXPIRATION_MINUTES" : "1",
         "JWT_REFRESH_TOKEN_EXPIRATION_DAYS" : "7",
         "ENCRYPTION_KEY": "HQ6Q3Z0S1Ap9Iq+x4idcu/NGCTN1h4NpZt6o8wB6Cmw=",
         "ENCRYPTION_IV": "5+ctVfuAm8eRXJJvnDa59g=="
