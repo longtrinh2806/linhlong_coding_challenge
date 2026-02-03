@@ -8,6 +8,10 @@ export const API_ENDPOINTS = {
     REGISTER: `${API_URL}/authentication/register`,
     REFRESH: `${API_URL}/authentication/refresh`,
   },
+  HEALTH: {
+    CHECK: `${API_URL}/health`,
+  },
 } as const;
 
 export type AuthEndpoint = (typeof API_ENDPOINTS.AUTH)[keyof typeof API_ENDPOINTS.AUTH];
+export type HealthEndpoint = (typeof API_ENDPOINTS.HEALTH)[keyof typeof API_ENDPOINTS.HEALTH];

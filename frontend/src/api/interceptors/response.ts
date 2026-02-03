@@ -31,7 +31,7 @@ export const handleAuthError = async (error: AxiosError): Promise<never> => {
         refreshToken,
       });
 
-      const { accessToken, refreshToken: newRefreshToken } = response.data;
+      const { accessToken, refreshToken: newRefreshToken } = response.data.value;
       setAuthTokens(accessToken, newRefreshToken);
 
       if (originalRequest.headers) {
