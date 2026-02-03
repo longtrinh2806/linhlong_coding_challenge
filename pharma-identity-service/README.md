@@ -1,6 +1,6 @@
 # Pharma Identity Service
 
-A robust identity and authentication service built with .NET 9, implementing JWT-based authentication with refresh tokens, using Clean Architecture principles and CQRS pattern.
+A robust identity and authentication service built with .NET 10, implementing JWT-based authentication with refresh tokens, using Clean Architecture principles and CQRS pattern.
 
 ## 🏗️ Architecture
 
