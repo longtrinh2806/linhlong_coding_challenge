@@ -10,9 +10,14 @@ export interface RegisterRequest {
 }
 
 export interface AuthResponse {
-    accessToken: string;
-    refreshToken: string;
-    userRole: string;
+    value: {
+        accessToken: string;
+        refreshToken: string;
+        userRole: string;
+    };
+    isSuccess: boolean;
+    statusCode: number;
+    errors: Record<string, unknown>;
 }
 
 export interface RefreshTokenRequest {

@@ -1,5 +1,6 @@
 import api from '../axios';
 import { API_ENDPOINTS } from '../endpoints';
+import { setAuthTokens } from '../apiError';
 import type {
   LoginRequest,
   RegisterRequest,
@@ -8,11 +9,19 @@ import type {
 } from '../../types/auth';
 
 export const authService = {
-  login: (data: LoginRequest) =>
-    api.post<AuthResponse>(API_ENDPOINTS.AUTH.LOGIN, data),
+  login: async (data: LoginRequest): Promise<AuthResponse> => {
+    const response = await api.post<AuthResponse>(API_ENDPOINTS.AUTH.LOGIN, data);
+    const { accessToken, refreshToken } = response.data.value;
+    setAuthTokens(accessToken, refreshToken);
+    return response.data;
+  },
 
-  register: (data: RegisterRequest) =>
-    api.post<AuthResponse>(API_ENDPOINTS.AUTH.REGISTER, data),
+  register: async (data: RegisterRequest): Promise<AuthResponse> => {
+    const response = await api.post<AuthResponse>(API_ENDPOINTS.AUTH.REGISTER, data);
+    const { accessToken, refreshToken } = response.data.value;
+    setAuthTokens(accessToken, refreshToken);
+    return response.data;
+  },
 
   refreshToken: (data: RefreshTokenRequest) =>
     api.post<AuthResponse>(API_ENDPOINTS.AUTH.REFRESH, data),
