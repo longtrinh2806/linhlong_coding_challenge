@@ -1,49 +1,69 @@
 import { type AxiosError } from 'axios';
-import { t, getCurrentLocale, type Locale } from '../locales/i18n';
+import { t } from '../locales/i18n';
 import { AUTH_STORAGE_KEYS } from '../constants';
 
+// Handle different API response formats
 export interface ApiErrorResponse {
-  message: string;
+  message?: string;
+  errors?: {
+    message?: string;
+    [key: string]: unknown;
+  };
   code?: string;
   details?: Record<string, string>;
 }
 
-// Get current locale dynamically
-const getLocale = (): Locale => getCurrentLocale();
-
 export const getApiErrorMessage = (error: unknown): string => {
-  if (error instanceof Error && error.message) {
-    return error.message;
-  }
-
-  const axiosError = error as AxiosError<ApiErrorResponse>;
-  const locale = getLocale();
   const translations = t();
 
-  if (axiosError.response?.data?.message) {
-    return axiosError.response.data.message;
+  // Check if it's an AxiosError first (before checking Error, since AxiosError extends Error)
+  const axiosError = error as AxiosError<ApiErrorResponse>;
+  
+  if (axiosError.isAxiosError && axiosError.response) {
+    const responseData = axiosError.response.data;
+
+    if (responseData?.errors?.message) {
+      return responseData.errors.message;
+    }
+
+    if (responseData?.message) {
+      return responseData.message;
+    }
+
+    // Handle specific status codes
+    switch (axiosError.response.status) {
+      case 400:
+        return translations.errors.badRequest;
+      case 401:
+        return translations.errors.unauthorized;
+      case 403:
+        return translations.errors.forbidden;
+      case 404:
+        return translations.errors.notFound;
+      case 422:
+        return translations.errors.validationError;
+      case 500:
+        return translations.errors.serverError;
+      default:
+        return `Error: ${axiosError.response.status}`;
+    }
   }
 
-  if (axiosError.response?.status === 401) {
-    return locale === 'vi' ? 'Unauthorized. Please log in again.' : translations.errors.unauthorized;
-  }
-
-  if (axiosError.response?.status === 403) {
-    return translations.errors.forbidden;
-  }
-
-  if (axiosError.response?.status === 404) {
-    return translations.errors.notFound;
-  }
-
-  if (axiosError.response?.status === 500) {
-    return translations.errors.serverError;
-  }
-
-  if (axiosError.code === 'ERR_NETWORK') {
+  // Handle network errors
+  if (axiosError.isAxiosError && axiosError.code === 'ERR_NETWORK') {
     return translations.errors.networkError;
   }
 
+  if (axiosError.isAxiosError && axiosError.code === 'ERR_CANCELED') {
+    return translations.errors.requestCancelled;
+  }
+
+  // Handle plain Error objects
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  // Fallback for unknown errors
   return translations.errors.unexpectedError;
 };
 

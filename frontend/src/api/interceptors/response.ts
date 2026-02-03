@@ -4,7 +4,6 @@ import {
   getRefreshToken,
   setAuthTokens,
   clearAuthStorage,
-  getApiErrorMessage,
 } from '../apiError';
 import { AUTH_ROUTES } from '../../constants';
 import { t } from '../../locales/i18n';
@@ -46,5 +45,5 @@ export const handleAuthError = async (error: AxiosError): Promise<never> => {
     }
   }
 
-  throw getApiErrorMessage(error);
+  throw error;
 };
