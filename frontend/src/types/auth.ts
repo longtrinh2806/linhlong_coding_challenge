@@ -1,31 +1,37 @@
 export interface LoginRequest {
-    email: string;
-    password: string;
+  email: string;
+  password: string;
 }
 
 export interface RegisterRequest {
-    email: string;
-    password: string;
-    confirmPassword: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+
+export interface User {
+  id: string;
+  email: string;
+  role: string;
 }
 
 export interface AuthResponse {
-    value: {
-        accessToken: string;
-        refreshToken: string;
-        userRole: string;
-    };
-    isSuccess: boolean;
-    statusCode: number;
-    errors: Record<string, unknown>;
+  value: {
+    accessToken: string;
+    refreshToken: string;
+    userRole: string;
+  };
+  isSuccess: boolean;
+  statusCode: number;
+  errors: Record<string, unknown>;
 }
 
 export interface RefreshTokenRequest {
-    refreshToken: string;
+  refreshToken: string;
 }
 
 export interface ApiError {
-    message: string;
-    code?: string;
-    details?: Record<string, string>;
+  message: string;
+  code?: string;
+  details?: Record<string, string>;
 }
