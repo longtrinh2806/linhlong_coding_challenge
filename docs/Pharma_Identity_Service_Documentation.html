@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word">
+<head>
+    <meta charset="utf-8">
+    <title>Pharma Identity Service - Technical Documentation</title>
+    <!--[if gte mso 9]>
+    <xml>
+        <w:WordDocument>
+            <w:View>Print</w:View>
+            <w:Zoom>100</w:Zoom>
+        </w:WordDocument>
+    </xml>
+    <![endif]-->
+    <style>
+        body {
+            font-family: 'Calibri', 'Arial', sans-serif;
+            font-size: 11pt;
+            line-height: 1.5;
+            margin: 1in;
+            color: #333;
+        }
+        h1 {
+            font-size: 24pt;
+            color: #2E5090;
+            margin-top: 24pt;
+            margin-bottom: 12pt;
+            page-break-after: avoid;
+        }
+        h2 {
+            font-size: 18pt;
+            color: #2E5090;
+            margin-top: 18pt;
+            margin-bottom: 8pt;
+            page-break-after: avoid;
+        }
+        h3 {
+            font-size: 14pt;
+            color: #2E5090;
+            margin-top: 14pt;
+            margin-bottom: 6pt;
+            page-break-after: avoid;
+        }
+        h4 {
+            font-size: 12pt;
+            color: #2E5090;
+            margin-top: 12pt;
+            margin-bottom: 4pt;
+        }
+        p {
+            margin: 0 0 8pt 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12pt 0;
+        }
+        th, td {
+            border: 1pt solid #ddd;
+            padding: 8pt;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        code {
+            background-color: #f5f5f5;
+            padding: 2pt 4pt;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 10pt;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 12pt;
+            margin: 12pt 0;
+            border-left: 3pt solid #2E5090;
+            overflow-x: auto;
+        }
+        pre code {
+            background-color: transparent;
+            padding: 0;
+        }
+        .title-page {
+            text-align: center;
+            page-break-after: always;
+        }
+        .title-page h1 {
+            font-size: 32pt;
+            margin-top: 2in;
+        }
+        .subtitle {
+            font-size: 16pt;
+            color: #666;
+        }
+        .info-table {
+            width: 50%;
+            margin: 24pt auto;
+        }
+        .info-table td {
+            border: none;
+            padding: 4pt;
+        }
+        .info-table td:first-child {
+            font-weight: bold;
+            width: 40%;
+        }
+        ul, ol {
+            margin: 8pt 0;
+            padding-left: 24pt;
+        }
+        li {
+            margin: 4pt 0;
+        }
+        .diagram-box {
+            background-color: #f9f9f9;
+            border: 1pt solid #ccc;
+            padding: 16pt;
+            margin: 16pt 0;
+            text-align: center;
+        }
+        .note {
+            background-color: #ffffcc;
+            border-left: 4pt solid #ffcc00;
+            padding: 8pt 12pt;
+            margin: 12pt 0;
+        }
+        .warning {
+            background-color: #ffe6e6;
+            border-left: 4pt solid #cc0000;
+            padding: 8pt 12pt;
+            margin: 12pt 0;
+        }
+        .page-break {
+            page-break-after: always;
+        }
+        @media print {
+            body {
+                margin: 0.5in;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="title-page">
+    <h1>Pharma Identity Service</h1>
+    <p class="subtitle">Technical Documentation</p>
+    <table class="info-table">
+        <tr>
+            <td>Date:</td>
+            <td>February 2026</td>
+        </tr>
+        <tr>
+            <td>Version:</td>
+            <td>1.0</td>
+        </tr>
+        <tr>
+            <td>Author:</td>
+            <td>Development Team</td>
+        </tr>
+    </table>
+</div>
+
+<h1 id="1-introduction">1. Introduction</h1>
+
+<h2 id="1-1-purpose">1.1 Purpose</h2>
+<p>This document provides comprehensive technical documentation for the Pharma Identity Service, an authentication and identity management system built with modern web technologies. The service implements secure user registration, login, and token management using industry best practices.</p>
+
+<h2 id="1-2-scope">1.2 Scope</h2>
+<p>The Pharma Identity Service handles:</p>
+<ul>
+    <li>User registration and authentication</li>
+    <li>JWT-based session management</li>
+    <li>Secure password storage</li>
+    <li>Account lockout mechanisms</li>
+    <li>Role-based access control</li>
+</ul>
+
+<h2 id="1-3-system-overview">1.3 System Overview</h2>
+<p>The system is a client-server application consisting of:</p>
+<ul>
+    <li><strong>Backend</strong>: ASP.NET Core Web API (.NET 10)</li>
+    <li><strong>Frontend</strong>: React Single Page Application</li>
+    <li><strong>Database</strong>: PostgreSQL</li>
+    <li><strong>Cache</strong>: Redis</li>
+</ul>
+
+<div class="diagram-box">
+    <p><strong>System Architecture Overview</strong></p>
+    <p>[Client] → [React SPA] → [ASP.NET Core API] → [PostgreSQL/Redis]</p>
+</div>
+
+<h1 id="2-architecture-overview">2. Architecture Overview</h1>
+
+<h2 id="2-1-high-level-architecture">2.1 High-Level Architecture</h2>
+
+<div class="diagram-box">
+    <p><strong>High-Level Architecture Diagram</strong></p>
+    <pre>
+┌─────────────────────────────────────────────────┐
+│              Frontend Client                     │
+│              (React SPA)                        │
+└────────────────────┬────────────────────────────┘
+                     │ HTTP Requests
+                     ▼
+┌─────────────────────────────────────────────────┐
+│              Backend Server                      │
+│         (ASP.NET Core Web API)                   │
+│  ┌─────────────────────────────────────────────┐│
+│  │            MediatR (CQRS)                    ││
+│  │  ┌─────────────────────────────────────────┐││
+│  │  │      Command/Query Handlers            │││
+│  │  └─────────────────────────────────────────┘││
+│  └─────────────────────────────────────────────┘│
+└────────────────────┬────────────────────────────┘
+                     │
+          ┌──────────┼──────────┐
+          ▼          ▼          ▼
+    ┌──────────┐ ┌──────────┐ ┌──────────┐
+    │PostgreSQL│ │  Redis   │ │  Services│
+    │ Database │ │  Cache   │ │          │
+    └──────────┘ └──────────┘ └──────────┘
+    </pre>
+</div>
+
+<h2 id="2-2-clean-architecture-layers">2.2 Clean Architecture Layers</h2>
+
+<div class="diagram-box">
+    <p><strong>Clean Architecture Layers</strong></p>
+    <pre>
+┌─────────────────────────────────────────────────┐
+│           Presentation Layer (API)             │
+│   Controllers | Middlewares | Extensions       │
+├─────────────────────────────────────────────────┤
+│           Application Layer                     │
+│   CQRS Commands/Queries | DTOs | Behaviors    │
+├─────────────────────────────────────────────────┤
+│           Domain Layer                          │
+│   Entities | Abstractions | Business Logic     │
+├─────────────────────────────────────────────────┤
+│           Infrastructure Layer                  │
+│   Database | Repositories | Services | External│
+└─────────────────────────────────────────────────┘
+    </pre>
+</div>
+
+<h2 id="2-3-system-components">2.3 System Components</h2>
+
+<div class="diagram-box">
+    <p><strong>Component Interaction Diagram</strong></p>
+    <pre>
+┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+│   Frontend   │────▶│  Controllers │────▶│  Handlers    │
+│   (React)    │◀────│              │◀────│  (CQRS)      │
+└──────────────┘     └──────────────┘     └──────────────┘
+      │                                           │
+      │                                           ▼
+      │                                   ┌──────────────┐
+      │                                   │   Services   │
+      │                                   │ (JWT|Hashing)│
+      │                                   └──────┬───────┘
+      │                                          │
+      ▼                                          ▼
+┌──────────────┐                         ┌──────────────┐
+│   Browser    │                         │    Data      │
+│   Storage    │                         │  (PG|Redis)  │
+└──────────────┘                         └──────────────┘
+    </pre>
+</div>
+
+<h1 id="3-component-descriptions">3. Component Descriptions</h1>
+
+<h2 id="3-1-frontend-components">3.1 Frontend Components</h2>
+
+<h3 id="3-1-1-react-application">3.1.1 React Application (App.tsx)</h3>
+<p><strong>Purpose</strong>: Main application entry point that handles routing and authentication state</p>
+<p><strong>Key Responsibilities</strong>:</p>
+<ul>
+    <li>Initialize React Router for navigation</li>
+    <li>Check authentication state on app load</li>
+    <li>Redirect users based on auth status</li>
+    <li>Protect routes requiring authentication</li>
+</ul>
+
+<h3 id="3-1-2-login-page">3.1.2 Login Page (Login.tsx)</h3>
+<p><strong>Purpose</strong>: User authentication interface</p>
+<p><strong>Key Responsibilities</strong>:</p>
+<ul>
+    <li>Display login form with email and password fields</li>
+    <li>Client-side validation</li>
+    <li>Handle form submission</li>
+    <li>Display error messages</li>
+    <li>Store tokens on successful login</li>
+</ul>
+
+<h3 id="3-1-3-register-page">3.1.3 Register Page (Register.tsx)</h3>
+<p><strong>Purpose</strong>: New user registration interface</p>
+<p><strong>Key Responsibilities</strong>:</p>
+<ul>
+    <li>Display registration form</li>
+    <li>Validate password requirements (min 12 chars, uppercase, special char)</li>
+    <li>Confirm password matching</li>
+    <li>Handle registration submission</li>
+</ul>
+
+<h3 id="3-1-4-protected-route">3.1.4 Protected Route (ProtectedRoute.tsx)</h3>
+<p><strong>Purpose</strong>: Route guard for authenticated pages</p>
+<p><strong>Key Responsibilities</strong>:</p>
+<ul>
+    <li>Check for valid access and refresh tokens</li>
+    <li>Redirect unauthorized users to login</li>
+    <li>Wrap protected child components</li>
+</ul>
+
+<h3 id="3-1-5-http-interceptors">3.1.5 HTTP Interceptors</h3>
+<p><strong>Request Interceptor</strong>:</p>
+<ul>
+    <li>Automatically adds Authorization header with Bearer token</li>
+    <li>Attaches JWT to every outgoing request</li>
+</ul>
+<p><strong>Response Interceptor</strong>:</p>
+<ul>
+    <li>Catches 401 Unauthorized responses</li>
+    <li>Attempts to refresh the access token</li>
+    <li>Retries original request or redirects to login</li>
+</ul>
+
+<h2 id="3-2-backend-components">3.2 Backend Components</h2>
+
+<h3 id="3-2-1-authentication-controller">3.2.1 Authentication Controller</h3>
+<p><strong>Purpose</strong>: HTTP API endpoint handler</p>
+<p><strong>Key Responsibilities</strong>:</p>
+<ul>
+    <li>Expose authentication endpoints</li>
+    <li>Route requests to MediatR</li>
+    <li>Return standardized responses</li>
+</ul>
+<p><strong>Endpoints</strong>:</p>
+<ul>
+    <li><code>POST /api/authentication/register</code></li>
+    <li><code>POST /api/authentication/login</code></li>
+    <li><code>POST /api/authentication/refresh</code></li>
+</ul>
+
+<h3 id="3-2-2-login-command-handler">3.2.2 Login Command Handler</h3>
+<p><strong>Purpose</strong>: Process user login requests</p>
+<p><strong>Key Responsibilities</strong>:</p>
+<ul>
+    <li>Find user by email</li>
+    <li>Check account lockout status</li>
+    <li>Validate password</li>
+    <li>Track failed login attempts</li>
+    <li>Generate JWT tokens</li>
+    <li>Store refresh token in Redis</li>
+</ul>
+<p><strong>Security Features</strong>:</p>
+<ul>
+    <li>5 failed attempts = 30-minute lockout</li>
+    <li>Failed attempt counter reset on successful login</li>
+</ul>
+
+<h3 id="3-2-3-register-command-handler">3.2.3 Register Command Handler</h3>
+<p><strong>Purpose</strong>: Create new user accounts</p>
+<p><strong>Key Responsibilities</strong>:</p>
+<ul>
+    <li>Check for existing email</li>
+    <li>Validate password strength</li>
+    <li>Hash password using BCrypt</li>
+    <li>Create user with default "Viewer" role</li>
+</ul>
+
+<h3 id="3-2-4-refresh-token-handler">3.2.4 Refresh Token Handler</h3>
+<p><strong>Purpose</strong>: Generate new access tokens</p>
+<p><strong>Key Responsibilities</strong>:</p>
+<ul>
+    <li>Validate refresh token signature</li>
+    <li>Check token exists in Redis cache</li>
+    <li>Calculate remaining TTL</li>
+    <li>Generate new token pair</li>
+    <li>Update Redis with new refresh token</li>
+</ul>
+
+<h3 id="3-2-5-jwt-token-service">3.2.5 JWT Token Service</h3>
+<p><strong>Purpose</strong>: JWT token generation and validation</p>
+<p><strong>Key Responsibilities</strong>:</p>
+<ul>
+    <li>Generate access tokens (short-lived)</li>
+    <li>Generate refresh tokens (long-lived)</li>
+    <li>Validate refresh tokens</li>
+    <li>Extract claims from tokens</li>
+</ul>
+
+<h3 id="3-2-6-redis-caching-service">3.2.6 Redis Caching Service</h3>
+<p><strong>Purpose</strong>: Token caching and session management</p>
+<p><strong>Key Responsibilities</strong>:</p>
+<ul>
+    <li>Store refresh tokens in Redis</li>
+    <li>Retrieve cached tokens</li>
+    <li>Set token expiration</li>
+    <li>Remove tokens on logout</li>
+</ul>
+
+<h3 id="3-2-7-user-repository">3.2.7 User Repository</h3>
+<p><strong>Purpose</strong>: Database access layer for users</p>
+<p><strong>Key Responsibilities</strong>:</p>
+<ul>
+    <li>CRUD operations for users</li>
+    <li>Query by email</li>
+    <li>Include related entities (Role)</li>
+</ul>
+
+<h2 id="3-3-database-components">3.3 Database Components</h2>
+
+<h3 id="3-3-1-user-entity">3.3.1 User Entity</h3>
+<p><strong>Purpose</strong>: Domain model for user data</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Field</th>
+            <th>Type</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>UserId</td>
+            <td>Ulid</td>
+            <td>Primary key, unique identifier</td>
+        </tr>
+        <tr>
+            <td>Email</td>
+            <td>string</td>
+            <td>User email (unique)</td>
+        </tr>
+        <tr>
+            <td>Password</td>
+            <td>string</td>
+            <td>Hashed password</td>
+        </tr>
+        <tr>
+            <td>RoleId</td>
+            <td>int</td>
+            <td>Foreign key to Role</td>
+        </tr>
+        <tr>
+            <td>IsAccountLocked</td>
+            <td>bool</td>
+            <td>Account lock status</td>
+        </tr>
+        <tr>
+            <td>FailedLoginAttempts</td>
+            <td>int</td>
+            <td>Failed login counter</td>
+        </tr>
+        <tr>
+            <td>LastFailedLoginAt</td>
+            <td>DateTime?</td>
+            <td>Last failed attempt time</td>
+        </tr>
+        <tr>
+            <td>LockedUntil</td>
+            <td>DateTime?</td>
+            <td>Lockout expiration</td>
+        </tr>
+    </tbody>
+</table>
+
+<h3 id="3-3-2-role-entity">3.3.2 Role Entity</h3>
+<p><strong>Purpose</strong>: Role definition for access control</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Field</th>
+            <th>Type</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>RoleId</td>
+            <td>int</td>
+            <td>Primary key</td>
+        </tr>
+        <tr>
+            <td>Name</td>
+            <td>string</td>
+            <td>Role name (e.g., "Viewer")</td>
+        </tr>
+    </tbody>
+</table>
+
+<h1 id="4-data-flow-explanations">4. Data Flow Explanations</h1>
+
+<h2 id="4-1-user-registration-flow">4.1 User Registration Flow</h2>
+
+<div class="diagram-box">
+    <p><strong>Registration Sequence Diagram</strong></p>
+    <pre>
+1. User fills registration form
+   User → Frontend: email, password, confirmPassword
+
+2. Frontend validates client-side
+   Frontend: Check password requirements
+
+3. Frontend sends API request
+   Frontend → API: POST /register
+
+4. API processes request
+   API → Handler: RegisterCommand
+   
+5. Handler checks existing user
+   Handler → Database: Find by email
+   
+6. If new user, create account
+   Handler → Database: Hash password, Create User
+   Handler → Redis: (none)
+   
+7. Return tokens
+   Handler → API: Success with JWT tokens
+   API → Frontend: accessToken, refreshToken
+   
+8. Frontend stores tokens
+   Frontend → localStorage: Store tokens
+   Frontend → Home: Redirect
+    </pre>
+</div>
+
+<p><strong>Step-by-Step Explanation</strong>:</p>
+<ol>
+    <li>User fills registration form with email, password, and confirm password</li>
+    <li>Frontend performs client-side validation (password length, complexity)</li>
+    <li>Frontend sends POST request to <code>/api/authentication/register</code></li>
+    <li>API controller receives request and sends to MediatR</li>
+    <li>Register handler checks if user already exists</li>
+    <li>If user exists, return 400 error</li>
+    <li>If user doesn't exist, hash password using BCrypt</li>
+    <li>Create new user with default "Viewer" role</li>
+    <li>Return success with JWT tokens</li>
+    <li>Frontend stores tokens in localStorage</li>
+    <li>Redirect user to home page</li>
+</ol>
+
+<h2 id="4-2-user-login-flow">4.2 User Login Flow</h2>
+
+<div class="diagram-box">
+    <p><strong>Login Sequence Diagram</strong></p>
+    <pre>
+1. User enters credentials
+   User → Frontend: email, password
+
+2. Frontend sends API request
+   Frontend → API: POST /login
+
+3. API finds user
+   API → Handler: LoginCommand
+   Handler → Database: Find by email
+
+4. Check account lockout
+   If locked: Return error with remaining time
+   
+5. Validate password
+   Handler → Hasher: Compare password
+   
+6. On success:
+   - Reset failed attempts
+   - Generate JWT tokens
+   - Store refresh in Redis
+   Return: accessToken, refreshToken
+
+7. Frontend stores tokens
+   Frontend → localStorage: Store tokens
+   Frontend → Home: Redirect
+    </pre>
+</div>
+
+<p><strong>Step-by-Step Explanation</strong>:</p>
+<ol>
+    <li>User enters email and password</li>
+    <li>Frontend sends POST request to <code>/api/authentication/login</code></li>
+    <li>API controller routes to login handler via MediatR</li>
+    <li>Handler queries database for user by email</li>
+    <li>If user not found, return error</li>
+    <li>Check if account is locked (5+ failed attempts = 30 min lockout)</li>
+    <li>Validate password against stored hash</li>
+    <li>If invalid:
+        <ul>
+            <li>Increment failed attempts</li>
+            <li>Lock account if attempts >= 5</li>
+            <li>Return error</li>
+        </ul>
+    </li>
+    <li>If valid:
+        <ul>
+            <li>Reset failed attempts counter</li>
+            <li>Generate access token (1 min expiry)</li>
+            <li>Generate refresh token (7 days expiry)</li>
+            <li>Store refresh token in Redis</li>
+            <li>Return both tokens to client</li>
+        </ul>
+    </li>
+    <li>Frontend stores tokens in localStorage</li>
+    <li>Redirect user to home page</li>
+</ol>
+
+<h2 id="4-3-token-refresh-flow">4.3 Token Refresh Flow</h2>
+
+<div class="diagram-box">
+    <p><strong>Token Refresh Sequence Diagram</strong></p>
+    <pre>
+1. Access token expires
+   Frontend → API: Original request
+   API → Frontend: 401 Unauthorized
+
+2. Interceptor catches 401
+   Frontend → Interceptor: Handle 401
+
+3. Call refresh endpoint
+   Frontend → API: POST /refresh (with refreshToken)
+
+4. Validate refresh token
+   API → Handler: Validate signature
+   Handler → Redis: Check token in cache
+
+5. Generate new tokens
+   Handler → JWT Service: Generate new tokens
+   Handler → Redis: Update cached refresh token
+
+6. Return new tokens
+   API → Frontend: New accessToken, refreshToken
+
+7. Frontend retries request
+   Frontend → API: Retry original request
+   API → Frontend: Success
+    </pre>
+</div>
+
+<p><strong>Step-by-Step Explanation</strong>:</p>
+<ol>
+    <li>Frontend makes API request with expired access token</li>
+    <li>API returns 401 Unauthorized</li>
+    <li>Axios interceptor catches 401 error</li>
+    <li>Interceptor retrieves refresh token from storage</li>
+    <li>Frontend calls <code>/api/authentication/refresh</code> endpoint</li>
+    <li>Refresh handler validates refresh token signature</li>
+    <li>Handler extracts claims (userId, email)</li>
+    <li>Handler checks Redis for cached refresh token</li>
+    <li>If tokens match:
+        <ul>
+            <li>Calculate remaining TTL</li>
+            <li>Generate new access token</li>
+            <li>Generate new refresh token with remaining TTL</li>
+            <li>Update Redis with new refresh token</li>
+            <li>Return new tokens to client</li>
+        </ul>
+    </li>
+    <li>Frontend stores new tokens</li>
+    <li>Frontend retries original request with new access token</li>
+</ol>
+
+<h2 id="4-4-data-persistence-flow">4.4 Data Persistence Flow</h2>
+
+<div class="diagram-box">
+    <p><strong>Data Persistence Flow</strong></p>
+    <pre>
+┌─────────────────────────────────────────────────┐
+│            Application Layer                    │
+│         Command Handler                         │
+└────────────────────┬────────────────────────────┘
+                     │ Call repository
+                     ▼
+┌─────────────────────────────────────────────────┐
+│           Infrastructure Layer                   │
+│            Unit of Work                         │
+└────────────────────┬────────────────────────────┘
+                     │ Manage context
+                     ▼
+┌─────────────────────────────────────────────────┐
+│              Entity Framework Core              │
+│              DbContext                          │
+│              (Change Tracker)                   │
+└────────────────────┬────────────────────────────┘
+                     │ Save changes
+                     ▼
+┌─────────────────────────────────────────────────┐
+│              PostgreSQL Database                 │
+└─────────────────────────────────────────────────┘
+    </pre>
+</div>
+
+<p><strong>Step-by-Step Explanation</strong>:</p>
+<ol>
+    <li>Command handler receives business request</li>
+    <li>Handler calls repository methods</li>
+    <li>Repository delegates to Unit of Work</li>
+    <li>Unit of Work manages DbContext</li>
+    <li>DbContext tracks entity changes</li>
+    <li>On SaveChanges:
+        <ul>
+            <li>EF Core generates SQL</li>
+            <li>Changes committed to PostgreSQL</li>
+            <li>Auditable fields automatically updated</li>
+        </ul>
+    </li>
+</ol>
+
+<h1 id="5-technology-stack">5. Technology Stack</h1>
+
+<h2 id="5-1-backend-technologies">5.1 Backend Technologies</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Category</th>
+            <th>Technology</th>
+            <th>Version</th>
+            <th>Purpose</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Runtime</td>
+            <td>.NET</td>
+            <td>10</td>
+            <td>Application framework</td>
+        </tr>
+        <tr>
+            <td>API</td>
+            <td>ASP.NET Core</td>
+            <td>10</td>
+            <td>Web API framework</td>
+        </tr>
+        <tr>
+            <td>Database</td>
+            <td>PostgreSQL</td>
+            <td>18</td>
+            <td>Primary database</td>
+        </tr>
+        <tr>
+            <td>ORM</td>
+            <td>Entity Framework Core</td>
+            <td>9.x</td>
+            <td>Object-relational mapping</td>
+        </tr>
+        <tr>
+            <td>CQRS</td>
+            <td>MediatR</td>
+            <td>13.x</td>
+            <td>Message dispatching</td>
+        </tr>
+        <tr>
+            <td>Validation</td>
+            <td>FluentValidation</td>
+            <td>11.x</td>
+            <td>Input validation</td>
+        </tr>
+        <tr>
+            <td>JWT</td>
+            <td>System.IdentityModel.Tokens.Jwt</td>
+            <td>7.x</td>
+            <td>Token handling</td>
+        </tr>
+        <tr>
+            <td>Caching</td>
+            <td>Redis</td>
+            <td>8.0.5</td>
+            <td>Distributed caching</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2 id="5-2-frontend-technologies">5.2 Frontend Technologies</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Category</th>
+            <th>Technology</th>
+            <th>Version</th>
+            <th>Purpose</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Framework</td>
+            <td>React</td>
+            <td>19.2.0</td>
+            <td>UI library</td>
+        </tr>
+        <tr>
+            <td>Language</td>
+            <td>TypeScript</td>
+            <td>5.9</td>
+            <td>Type-safe JavaScript</td>
+        </tr>
+        <tr>
+            <td>Build Tool</td>
+            <td>Vite</td>
+            <td>7.2.4</td>
+            <td>Development server & bundler</td>
+        </tr>
+        <tr>
+            <td>Routing</td>
+            <td>React Router</td>
+            <td>7.13.0</td>
+            <td>Client-side routing</td>
+        </tr>
+        <tr>
+            <td>HTTP Client</td>
+            <td>Axios</td>
+            <td>1.13.4</td>
+            <td>API requests</td>
+        </tr>
+        <tr>
+            <td>Styling</td>
+            <td>Tailwind CSS</td>
+            <td>4.1.18</td>
+            <td>Utility-first CSS</td>
+        </tr>
+    </tbody>
+</table>
+
+<h1 id="6-api-reference">6. API Reference</h1>
+
+<h2 id="6-1-authentication-endpoints">6.1 Authentication Endpoints</h2>
+
+<h3 id="6-1-1-register">6.1.1 Register</h3>
+<pre><code>POST /api/authentication/register
+Content-Type: application/json
+
+Request Body:
+{
+  "email": "user@example.com",
+  "password": "SecurePass123!",
+  "confirmPassword": "SecurePass123!"
+}
+
+Response (200 OK):
+{
+  "value": {
+    "accessToken": "eyJhbGc...",
+    "refreshToken": "eyJhbGc...",
+    "userRole": "Viewer"
+  },
+  "isSuccess": true,
+  "statusCode": 200,
+  "errors": {}
+}</code></pre>
+
+<h3 id="6-1-2-login">6.1.2 Login</h3>
+<pre><code>POST /api/authentication/login
+Content-Type: application/json
+
+Request Body:
+{
+  "email": "user@example.com",
+  "password": "SecurePass123!"
+}
+
+Response (200 OK):
+{
+  "value": {
+    "accessToken": "eyJhbGc...",
+    "refreshToken": "eyJhbGc...",
+    "userRole": "Viewer"
+  },
+  "isSuccess": true,
+  "statusCode": 200,
+  "errors": {}
+}</code></pre>
+
+<h3 id="6-1-3-refresh-token">6.1.3 Refresh Token</h3>
+<pre><code>POST /api/authentication/refresh
+Content-Type: application/json
+
+Request Body:
+{
+  "refreshToken": "eyJhbGc..."
+}
+
+Response (200 OK):
+{
+  "value": {
+    "accessToken": "eyJhbGc...",
+    "refreshToken": "eyJhbGc...",
+    "userRole": null
+  },
+  "isSuccess": true,
+  "statusCode": 200,
+  "errors": {}
+}</code></pre>
+
+<h2 id="6-2-health-check">6.2 Health Check</h2>
+<pre><code>GET /api/health
+
+Response:
+Pharma Identity Service is healthy.</code></pre>
+
+<h1 id="7-security-considerations">7. Security Considerations</h1>
+
+<h2 id="7-1-password-security">7.1 Password Security</h2>
+<ul>
+    <li><strong>Hashing</strong>: BCrypt with automatic salt generation</li>
+    <li><strong>Minimum Requirements</strong>: 12 characters, uppercase, special character</li>
+    <li><strong>No Plain Text</strong>: Passwords never stored in plain text</li>
+</ul>
+
+<h2 id="7-2-token-security">7.2 Token Security</h2>
+<ul>
+    <li><strong>Access Tokens</strong>: Short-lived (1 minute)</li>
+    <li><strong>Refresh Tokens</strong>: Long-lived (7 days), stored in Redis</li>
+    <li><strong>Token Rotation</strong>: New refresh token on each refresh</li>
+    <li><strong>No Clock Skew</strong>: Zero tolerance for token expiration</li>
+</ul>
+
+<h2 id="7-3-account-protection">7.3 Account Protection</h2>
+<ul>
+    <li><strong>Failed Attempts</strong>: Maximum 5 attempts before lockout</li>
+    <li><strong>Lockout Duration</strong>: 30 minutes automatic unlock</li>
+    <li><strong>Failed Tracking</strong>: Timestamp and counter stored in database</li>
+</ul>
+
+<h2 id="7-4-data-encryption">7.4 Data Encryption</h2>
+<ul>
+    <li><strong>Sensitive Data</strong>: AES-256 encryption for sensitive fields</li>
+    <li><strong>Key Management</strong>: Base64-encoded keys in configuration</li>
+    <li><strong>IV Rotation</strong>: Unique initialization vector per encryption</li>
+</ul>
+
+<hr>
+
+<p><strong>Document Version:</strong> 1.0</p>
+<p><strong>Last Updated:</strong> February 2026</p>
+
+</body>
+</html>
